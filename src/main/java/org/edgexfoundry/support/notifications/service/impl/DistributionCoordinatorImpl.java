@@ -52,6 +52,10 @@ public class DistributionCoordinatorImpl implements DistributionCoordinator {
   @Qualifier("EMAILSendingService")
   private SendingService emailSendingService;
 
+  @Autowired
+  @Qualifier("MQTTSendingService")
+  private SendingService mqttSendingService;
+
   @Async
   @Override
   public void distribute(Notification notification) {
@@ -101,6 +105,8 @@ public class DistributionCoordinatorImpl implements DistributionCoordinator {
       restfulSendingService.send(notification, channel, receiver);
     } else if (channel.getType() == ChannelType.EMAIL) {
       emailSendingService.send(notification, channel, receiver);
+    } else if (channel.getType() == ChannelType.MQTT) {
+      mqttSendingService.send(notification, channel, receiver);
     }
   }
 
@@ -122,6 +128,8 @@ public class DistributionCoordinatorImpl implements DistributionCoordinator {
       restfulSendingService.resend(transmission);
     } else if (channel.getType() == ChannelType.EMAIL) {
       emailSendingService.resend(transmission);
+    } else if (channel.getType() == ChannelType.MQTT) {
+      mqttSendingService.resend(transmission);
     }
   }
 

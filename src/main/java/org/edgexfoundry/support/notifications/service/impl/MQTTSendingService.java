@@ -5,10 +5,12 @@ import org.edgexfoundry.controller.AddressableClient;
 import org.edgexfoundry.domain.meta.Addressable;
 import org.edgexfoundry.support.domain.notifications.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.net.ssl.SSLContext;
 import java.util.HashMap;
 
+@Service("MQTTSendingService")
 public class MQTTSendingService extends  AbstractSendingService{
 
     private final static org.edgexfoundry.support.logging.client.EdgeXLogger logger = org.edgexfoundry.support.logging.client.EdgeXLoggerFactory
@@ -21,10 +23,12 @@ public class MQTTSendingService extends  AbstractSendingService{
 
     @Override
     TransmissionRecord sendToReceiver(Notification notification, Channel channel) {
+        logger.info("Sending notification via MQTT");
         MQTTChannel mqttChannel = (MQTTChannel)channel;
         MQTTSender s = senders.get(mqttChannel.getAddressable());
         if(s == null){
             Addressable addr = addressableClient.addressableForName(mqttChannel.getAddressable());
+            logger.info("creating MQTT client: "+ addr.getAddress());
             s = new MQTTSender(addr);
             senders.put(mqttChannel.getAddressable(), s);
         }
@@ -32,6 +36,7 @@ public class MQTTSendingService extends  AbstractSendingService{
         try {
             record.setSent(System.currentTimeMillis());
             s.sendMessage(notification.getContent().getBytes());
+            logger.info("Notification sent to MQTT broker "+ s.brokerUrl);
             record.setStatus(TransmissionStatus.SENT);
             record.setResponse("Notification sent to MQTT broker");
         } catch (Exception e){
