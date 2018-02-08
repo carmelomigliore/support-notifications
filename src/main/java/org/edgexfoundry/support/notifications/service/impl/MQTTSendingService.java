@@ -19,31 +19,38 @@ public class MQTTSendingService extends  AbstractSendingService{
     @Autowired
     private AddressableClient addressableClient;
 
-    private HashMap <String, MQTTSender> senders = new HashMap<>();
+    private static HashMap <String, MQTTSender> senders = new HashMap<>();
 
     @Override
     TransmissionRecord sendToReceiver(Notification notification, Channel channel) {
         logger.info("Sending notification via MQTT");
+
         MQTTChannel mqttChannel = (MQTTChannel)channel;
-        MQTTSender s = senders.get(mqttChannel.getAddressable());
-        if(s == null){
-            Addressable addr = addressableClient.addressableForName(mqttChannel.getAddressable());
-            logger.info("creating MQTT client: "+ addr.getAddress());
-            s = new MQTTSender(addr);
-            senders.put(mqttChannel.getAddressable(), s);
+        MQTTSender s = null;
+        synchronized (senders) {
+            s = senders.get(mqttChannel.getAddressable());
+            if (s == null) {
+                Addressable addr = addressableClient.addressableForName(mqttChannel.getAddressable());
+                logger.info("creating MQTT client: " + addr.getAddress());
+                s = new MQTTSender(addr);
+                senders.put(mqttChannel.getAddressable(), s);
+            }
         }
-        TransmissionRecord record = new TransmissionRecord();
-        try {
-            record.setSent(System.currentTimeMillis());
-            s.sendMessage(notification.getContent().getBytes());
-            logger.info("Notification sent to MQTT broker "+ s.brokerUrl);
-            record.setStatus(TransmissionStatus.SENT);
-            record.setResponse("Notification sent to MQTT broker");
-        } catch (Exception e){
-            record.setStatus(TransmissionStatus.FAILED);
-            record.setResponse(e.getMessage());
+        synchronized (s) {
+            TransmissionRecord record = new TransmissionRecord();
+            try {
+                record.setSent(System.currentTimeMillis());
+                s.sendMessage(notification.getContent().getBytes());
+                logger.info("Notification sent to MQTT broker " + s.brokerUrl);
+                record.setStatus(TransmissionStatus.SENT);
+                record.setResponse("Notification sent to MQTT broker");
+            } catch (Exception e) {
+                record.setStatus(TransmissionStatus.FAILED);
+                record.setResponse(e.getMessage());
+            }
+            return record;
         }
-        return record;
+
     }
 
     private static String buildBrokerUrl(Addressable addressable) {
@@ -91,6 +98,8 @@ public class MQTTSendingService extends  AbstractSendingService{
 
         public boolean sendMessage(byte[] messagePayload) throws Exception {
             if (client != null) {
+                if(!client.isConnected())
+                    connectClient();
                 try {
                     MqttMessage message = new MqttMessage(messagePayload);
                     message.setQos(qos);
