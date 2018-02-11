@@ -44,7 +44,7 @@ public class AzureSendingService extends AbstractSendingService {
                 record.setStatus(TransmissionStatus.SENT);
                 record.setResponse("Notification sent to Azure");
             } catch (Exception e) {
-                record.setStatus(TransmissionStatus.FAILED);
+                record.setStatus(TransmissionStatus.FAILED); //TODO failure based on callback result
                 record.setResponse(e.getMessage());
             }
             return record;
