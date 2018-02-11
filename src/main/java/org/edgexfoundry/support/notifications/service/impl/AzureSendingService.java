@@ -110,26 +110,15 @@ public class AzureSendingService extends AbstractSendingService {
             logger.debug("Successfully created an IoT Hub client.");
         }
 
-        public synchronized boolean sendMessage(byte[] messagePayload) {
+        public synchronized boolean sendMessage(byte[] messagePayload) throws Exception {
 
-            try {
-                //if(!connected) {
-                client.open();
-                logger.debug("Opened connection to IoT Hub.");
-                //	}
-                Message msg = new Message(messagePayload);
-                msg.setExpiryTime(5000);
-                //Object lockobj = new Object();
+            client.open();
+            logger.debug("Opened connection to IoT Hub.");
+            Message msg = new Message(messagePayload);
+            msg.setExpiryTime(5000);
 
-                client.sendEventAsync(msg, this, null);
-			/*synchronized (lockobj) {
-				lockobj.wait();
-			}*/
-                return true;
-            } catch (Exception e) {
-                logger.error("Failure: " + e.toString());
-            }
-            return false;
+            client.sendEventAsync(msg, this, null);
+            return true;
         }
     }
 }
