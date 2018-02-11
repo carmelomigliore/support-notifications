@@ -169,6 +169,11 @@
 			<version>${paho.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>com.microsoft.azure.sdk.iot</groupId>
+			<artifactId>iot-device-client</artifactId>
+			<version>1.8.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.edgexfoundry</groupId>
 			<artifactId>core-metadata-client</artifactId>
 			<version>${core-metadata-client.version}</version>
@@ -217,7 +222,7 @@
 						<id>install-external</id>
 						<phase>clean</phase>
 						<configuration>
-							<file>/media/carmelo/Data/edgex/support-domain/target/support-domain-0.5.0-SNAPSHOT.jar</file>
+							<file>${project.basedir}/src/main/resources/support-domain-0.5.0-SNAPSHOT.jar</file>
 							<repositoryLayout>default</repositoryLayout>
 							<groupId>org.edgexfoundry</groupId>
 							<artifactId>support-domain</artifactId>

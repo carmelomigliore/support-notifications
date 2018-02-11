@@ -56,6 +56,10 @@ public class DistributionCoordinatorImpl implements DistributionCoordinator {
   @Qualifier("MQTTSendingService")
   private SendingService mqttSendingService;
 
+  @Autowired
+  @Qualifier("AzureSendingService")
+  private SendingService azureSendingService;
+
   @Async
   @Override
   public void distribute(Notification notification) {
@@ -107,6 +111,8 @@ public class DistributionCoordinatorImpl implements DistributionCoordinator {
       emailSendingService.send(notification, channel, receiver);
     } else if (channel.getType() == ChannelType.MQTT) {
       mqttSendingService.send(notification, channel, receiver);
+    } else if (channel.getType() == ChannelType.AZURE) {
+      azureSendingService.send(notification, channel, receiver);
     }
   }
 
@@ -130,6 +136,8 @@ public class DistributionCoordinatorImpl implements DistributionCoordinator {
       emailSendingService.resend(transmission);
     } else if (channel.getType() == ChannelType.MQTT) {
       mqttSendingService.resend(transmission);
+    } else if(channel.getType() == ChannelType.AZURE){
+      azureSendingService.resend(transmission);
     }
   }
 
