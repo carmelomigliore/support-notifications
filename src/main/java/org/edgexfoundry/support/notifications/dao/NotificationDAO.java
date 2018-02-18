@@ -31,6 +31,8 @@ public interface NotificationDAO extends MongoRepository<Notification, String> {
 
   public Notification findBySlugIgnoreCase(String slug);
 
+  public Notification findBySlug(String slug);
+
   public List<Notification> findBySenderLikeIgnoreCase(String sender);
 
   public Page<Notification> findBySenderLikeIgnoreCase(String sender, Pageable pageable);

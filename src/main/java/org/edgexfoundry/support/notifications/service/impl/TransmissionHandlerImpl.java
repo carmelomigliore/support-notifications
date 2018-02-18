@@ -77,7 +77,8 @@ public class TransmissionHandlerImpl implements TransmissionHandler {
   @Override
   public List<Transmission> findByNotificationSlug(String slug) {
     logger.debug("TransmissionHandler is finding transmissions by notification slug=" + slug);
-    Notification notification = notificationDAO.findBySlugIgnoreCase(slug);
+    //Notification notification = notificationDAO.findBySlugIgnoreCase(slug);
+    Notification notification = notificationDAO.findBySlug(slug);
     if (notification == null) {
       throw new NotFoundException(Notification.class.toString(), slug);
     }
@@ -141,7 +142,8 @@ public class TransmissionHandlerImpl implements TransmissionHandler {
         + IN_LIMIT + limit);
     PageRequest request =
         new PageRequest(0, limit, new Sort(Sort.Direction.DESC, RECORD_CREATION_FIELD));
-    Notification notification = notificationDAO.findBySlugIgnoreCase(slug);
+    //Notification notification = notificationDAO.findBySlugIgnoreCase(slug);
+    Notification notification = notificationDAO.findBySlug(slug);
     if (notification == null) {
       throw new NotFoundException(Notification.class.toString(), slug);
     }

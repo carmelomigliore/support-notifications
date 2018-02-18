@@ -92,7 +92,8 @@ public class NotificationHandlerImpl implements NotificationHandler {
   @Override
   public Notification findBySlug(String slug) {
     logger.debug("NotificationHandler is finding notification by slug=" + slug);
-    return notificationDAO.findBySlugIgnoreCase(slug);
+    //return notificationDAO.findBySlugIgnoreCase(slug);
+    return notificationDAO.findBySlug(slug);
   }
 
   @Override
@@ -224,7 +225,8 @@ public class NotificationHandlerImpl implements NotificationHandler {
 
     Notification notification;
     try {
-      notification = notificationDAO.findBySlugIgnoreCase(slug);
+      //notification = notificationDAO.findBySlugIgnoreCase(slug);
+      notification = notificationDAO.findBySlug(slug);
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       throw new ServiceException(e);
